@@ -1,6 +1,42 @@
 import Image from "next/image";
 
-export default function Home() {
+type Photo = {
+  id: string;
+  created_at: string;
+  width: number;
+  height: number;
+  color: string;
+  description: string;
+  urls: {
+    raw: string;
+    full: string;
+    regular: string;
+    small: string;
+    thumb: string;
+  };
+  links: {
+    self: string;
+    html: string;
+    download: string;
+  };
+};
+
+const getRamdomPhotos = async (): Promise<Photo[]> => {
+  const params = new URLSearchParams();
+  params.append("client_id", process.env.UNSPLASH_ACCESS_KEY || "");
+  params.append("count", "32");
+  const response = await fetch(
+    `https://api.unsplash.com/photos/random?${params.toString()}`,
+    {
+      method: "GET",
+      cache: "no-cache",
+    }
+  );
+  return response.json();
+};
+
+const Home = async () => {
+  const randomPhotos = await getRamdomPhotos();
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
@@ -26,6 +62,18 @@ export default function Home() {
             />
           </a>
         </div>
+      </div>
+
+      <div>
+        {randomPhotos.map((photo) => (
+          <Image
+            key={photo.id}
+            src={photo.urls.small}
+            width={400}
+            height={photo.height * (400 / photo.width)}
+            alt={photo.description}
+          />
+        ))}
       </div>
 
       <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
@@ -110,4 +158,5 @@ export default function Home() {
       </div>
     </main>
   );
-}
+};
+export default Home;
