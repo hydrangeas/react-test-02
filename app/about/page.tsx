@@ -71,7 +71,7 @@ const Home = async () => {
             src={photo.urls.small}
             width={400}
             height={photo.height * (400 / photo.width)}
-            alt={photo.description}
+            alt={photo.description ?? "no description"}
           />
         ))}
       </div>
